@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  auth-client:
+    build:
+      context: ./../auth-client/
+      dockerfile: Dockerfile.built-in-server
+    image: auth-client:built-in-server
+    ports:
+    - "8080:8080"
