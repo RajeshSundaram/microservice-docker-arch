@@ -22,8 +22,14 @@ export default Vue.extend({
     }
   },
   methods: {
-    signin: () => {
-      console.log('signing in')
+    signin: function () {
+      if (this.loginCredintials.username && this.loginCredintials.password) {
+        Vue.axios.post('http://localhost:8080/auth/signin', {
+          username: this.loginCredintials.username,
+          password: this.loginCredintials.password
+        }).then(res => console.log(res))
+          .catch(err => console.error(err))
+      }
     },
     signup: function () {
       this.$router.push('/signup')
@@ -45,7 +51,7 @@ export default Vue.extend({
       display: flex;
       flex-direction: row;
       justify-content: center;
-      &.login-actions .el-button{
+      &.login-actions .el-button {
         margin: 0px 10px;
       }
     }
