@@ -1,0 +1,10 @@
+FROM node:lts-alpine
+ENV APPDIR /app
+WORKDIR $APPDIR
+COPY package*.json ./
+RUN npm i
+COPY . $APPDIR/
+EXPOSE 3000
+CMD npm run mon
+
+

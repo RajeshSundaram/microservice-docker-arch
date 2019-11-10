@@ -1,9 +1,51 @@
 version: '3.7'
 services:
-  auth-client:
+  # auth-client:
+  #   build:
+  #     context: ./../auth-client/
+  #     dockerfile: Dockerfile.built-in-server
+  #   image: auth-client:built-in-server
+  #   ports:
+  #   - "8080:8080"
+
+  nginx:
     build:
-      context: ./../auth-client/
-      dockerfile: Dockerfile.built-in-server
-    image: auth-client:built-in-server
+      context: ./../client/
+      dockerfile: ./../ci/Dockerfile.nginx
+    # image: nginx
+    ports: 
+      - "80:80"
+    # depends_on: 
+    #   - auth-client
+
+  cognito-db:
+    image: mongo:latest
+    restart: always
+    environment: 
+      MONGO_INITDB_ROOT_USERNAME: rajesh
+      MONGO_INITDB_ROOT_PASSWORD: rajesh
+      MONGO_INITDB_DATABASE: cognito_auth
+    volumes: 
+      - ./../cognito-server/cognito-data:/data/db
+      # - ./../cognito-server/cognito-data/init-db/:/docker-entrypoint-initdb.d/
+    ports: 
+      - "27017:27017"
+
+  cognito-server:
+    build:
+      context: ./../cognito-server/
+      dockerfile: ./../ci/Dockerfile.cognito-server
+    restart: always
     ports:
-    - "8080:8080"
+      - "8080:3000"
+    depends_on: 
+      - cognito-db
+    environment: 
+      - DB_HOST=cognito-db
+      - DB_PORT=27017
+      - DB_NAME=auth
+      - DB_USERNAME=rajesh
+      - DB_PASSWORD=rajesh
+    volumes: 
+      - ./../cognito-server:/app
+    # command: npm run prod
