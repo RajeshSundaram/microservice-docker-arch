@@ -4,12 +4,16 @@ import (
 	"net/http"
 
 	"./api"
+	"./data"
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	InitializeEnvironment()
 	router := mux.NewRouter()
 	router.Headers("Content-Type", "application/json")
+
+	router.HandleFunc("/env", sayHello).Methods("GET")
 
 	// Transactions
 	trx := router.PathPrefix("/trx").Subrouter()
@@ -19,5 +23,5 @@ func main() {
 }
 
 func sayHello(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte("Hello User"))
+	w.Write([]byte(data.GetDbConnectionURL()))
 }
