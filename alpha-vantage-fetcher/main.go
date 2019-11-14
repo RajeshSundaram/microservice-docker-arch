@@ -18,6 +18,7 @@ func main() {
 
 	currencyRoute := router.PathPrefix("/currency").Subrouter()
 	currencyRoute.HandleFunc("/list", currency.GetAllCurrencies)
+	currencyRoute.HandleFunc("/exchange/{from}/{to}", currency.GetCurrencyExchangeResult)
 
 	// Transactions
 	trx := router.PathPrefix("/trx").Subrouter()
