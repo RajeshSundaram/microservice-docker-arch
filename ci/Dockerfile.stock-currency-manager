@@ -1,0 +1,14 @@
+FROM golang:latest as app-builder
+WORKDIR /go/src/app
+COPY . .
+RUN go get
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a
+
+FROM amd64/alpine:3.7
+ARG profile="dev"
+WORKDIR /app
+COPY --from=app-builder /go/src/app/scm ./
+COPY --from=app-builder /go/src/app/.env* ./
+EXPOSE 8080
+ENV RS_PROFILE $profile
+CMD ["./scm"]

@@ -1,24 +1,16 @@
 version: '3.7'
 services:
-  # auth-client:
-  #   build:
-  #     context: ./../auth-client/
-  #     dockerfile: Dockerfile.built-in-server
-  #   image: auth-client:built-in-server
-  #   ports:
-  #   - "8080:8080"
-
   nginx:
+    container_name: micro_stock_client
     build:
       context: ./../client/
       dockerfile: ./../ci/Dockerfile.nginx
-    # image: nginx
     ports: 
-      - "80:80"
-    # depends_on: 
-    #   - auth-client
+      - 80:80
+      - 443:443
 
-  cognito-db:
+  cog-db:
+    container_name: micro_cog_auth_db
     image: mongo:latest
     restart: always
     environment: 
@@ -31,7 +23,8 @@ services:
     ports: 
       - "27017:27017"
 
-  cognito-server:
+  cog_server:
+    container_name: micro_cog_auth_server
     build:
       context: ./../cognito-server/
       dockerfile: ./../ci/Dockerfile.cognito-server
@@ -39,7 +32,7 @@ services:
     ports:
       - "8080:3000"
     depends_on: 
-      - cognito-db
+      - cog-db
     environment: 
       - DB_HOST=cognito-db
       - DB_PORT=27017
@@ -49,3 +42,29 @@ services:
     volumes: 
       - ./../cognito-server:/app
     # command: npm run prod
+
+  scm:
+    container_name: micro_scm
+    build: 
+      context: ./../stock-currency-manager
+      dockerfile: ./../ci/Dockerfile.stock-currency-manager
+    environment: 
+      - RS_PROFILE=
+      - DB_HOST=scm_db
+      - DB_USERNAME=prod
+      - DB_PASSWORD=1234
+    ports: 
+      - "8082:8080"
+    depends_on: 
+      - scm_db
+
+  scm_db:
+    container_name: micor_scm_db
+    image: postgres
+    ports: 
+      - "5432:5432"
+    environment: 
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=prod
+      - POSTGRES_DB=wallet
+    

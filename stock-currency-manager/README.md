@@ -1,0 +1,1 @@
+RS_PROFILE=dev go run
